@@ -1,5 +1,5 @@
 Haruo Suzuki  
-Last Update: 2018-12-25
+Last Update: 2018-12-28
 
 ----------
 
@@ -31,12 +31,13 @@ assembly_summary_refseq_historical.txt
 prokaryote_type_strain_report.txt
 species_genome_size.txt.gz
 
+# assembly_accession organism_name
+GCF_000005845.2 Escherichia coli str. K-12 substr. MG1655
+GCF_000008865.2 Escherichia coli O157:H7 str. Sakai
+
 # MD5 Checksums
 MD5 (GCF_000005845.2_ASM584v2_genomic.gff.gz) = 83b7ffb7880b432ca0ef8f591e4d0a3f
 MD5 (GCF_000008865.2_ASM886v2_genomic.gff.gz) = 75d2b78bb53ed8c8bd33978bb5c0e640
-MD5 (GCF_000026345.1_ASM2634v1_genomic.gff.gz) = e91c2ca813223487574c6d17de181d64
-MD5 (GCF_000183345.1_ASM18334v1_genomic.gff.gz) = fbaac512731af64b829fe82304f28777
-MD5 (GCF_000299455.1_ASM29945v1_genomic.gff.gz) = 96a94f2199e63d6a5c716ebad7c583e2
 ```
 
 ## scripts
@@ -59,6 +60,13 @@ metadata="$PWD/data/${YYYYMMDD}/${assembly_summary}"; output="$PWD/analysis/${YY
 bash scripts/run_inspecting_assembly_summary.sh "$metadata" 2> stderr.txt > "$output"
 ```
 
+downloading genome data (GFF files)
+```
+organism_name="Escherichia coli"
+organism_name="Escherichia coli|Borreliella burgdorferi|Sinorhizobium meliloti"
+organism_name="Escherichia coli str. K-12 substr. MG1655|Escherichia coli O157:H7 str. Sakai"
+bash scripts/run_get_gff.sh "$metadata" "$organism_name" 2> stderr.txt > log.get_gff.txt
+```
 
 inspecting genome data (GFF file) with:
 ```
@@ -66,8 +74,10 @@ GFF="data/GCF_000008865.2_ASM886v2_genomic.gff" # Escherichia coli O157:H7 str. 
 bash scripts/run_inspecting_gff.sh "$GFF" 2> stderr.txt > analysis/output_gff.txt
 ```
 
-## analysis
+bash scripts/run_inspecting_gff_all.sh "$GFF" > "analysis/output_gff_all.txt"
 
+
+## analysis
 
 ```
 # assembly_accession organism_name
@@ -80,29 +90,68 @@ GCF_000183345.1 Escherichia coli O83:H1 str. NRG 857C
 GCF_000299455.1 Escherichia coli O104:H4 str. 2011C-3493
 ```
 
+### genome size
+
+```
+# data/GCF_000008865.2_ASM886v2_genomic.gff
+NC_002695.2	5498578
+NC_002128.1	92721
+NC_002127.1	3306
+```
+
+### top 10 most abundant product names in genome
+
+```
+# GCF_000005845.2 Escherichia coli str. K-12 substr. MG1655
+# data/GCF_000005845.2_ASM584v2_genomic.gff
+NC_000913.3	4641652
+  32 putative inner membrane protein
+   8 putative oxidoreductase
+   8 IS5 transposase and trans-activator
+   6 IS1 protein InsB
+   6 IS1 protein InsA
+   5 hypothetical protein
+   4 putative structural protein%2C ethanolamine utilization microcompartment
+   4 putative hydrolase
+   4 inner membrane protein
+   4 IS3 element protein InsF
+
+# GCF_000008865.2 Escherichia coli O157:H7 str. Sakai
+# data/GCF_000008865.2_ASM886v2_genomic.gff
+
+ 784 hypothetical protein
+  84 inner membrane protein
+  77 transcriptional regulator
+  54 transposase
+  52 phage minor tail protein
+  31 transporter
+  28 oxidoreductase
+  28 lipoprotein
+  27 transcriptional repressor
+  26 membrane protein
+```
 
 ```
 diff analysis/2018-10-28/output_assembly_summary_refseq.txt analysis/2018-12-22/output_assembly_summary_refseq.txt
 ```
 
-
 ## updates
 
+- 2018-12-28
+ - Created shell scripts `scripts/run_inspecting_gff_all.sh`
+- 2018-12-25
+ - renamed shell scripts `scripts/*.sh`
+- 2018-12-22
+ - Created the project directory using `mkdir -p ./assembly_reports/{data,scripts,analysis}`
+ - Created shell scripts `scripts/*.sh`
+ - Downloadeded metadata from <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/>
+ - Downloaded genome data from <ftp://ftp.ncbi.nlm.nih.gov/genomes/all/>
 
 ```
 mkdir -p ./{data/$(date +%F),analysis/$(date +%F)}
 mkdir -p ./{data/2018-10-28,analysis/2018-10-28}
 mkdir -p ./{data/2018-12-22,analysis/2018-12-22}
 ```
-
-- 2018-12-25
- - renamed shell scripts `scripts/*.sh`
-
-- 2018-12-22
- - Created the project directory using `mkdir -p ./assembly_reports/{data,scripts,analysis}`
- - Created shell scripts `scripts/*.sh`
- - Downloadeded metadata from <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/>
- - Downloaded genome data from <ftp://ftp.ncbi.nlm.nih.gov/genomes/all/>
 
 ## run environment
 
