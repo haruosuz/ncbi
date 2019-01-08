@@ -1,15 +1,17 @@
 Haruo Suzuki  
-Last Update: 2018-12-28
+Last Update: 2019-01-08
 
 ----------
 
 # ASSEMBLY_REPORTS Project
-Project started 2018-12-22.  
+Project started 2018-10-28.  
 
 Using the assembly summary report files to find the sequence and annotation of my genome of interest.
 
 ## updates
 
+- 2019-01-08
+  - [reproducibility test](#reproducibility-test)
 - 2018-12-28
   - Created shell scripts `scripts/run_inspecting_gff_all.sh`
 - 2018-12-25
@@ -20,12 +22,6 @@ Using the assembly summary report files to find the sequence and annotation of m
   - Downloadeded metadata from <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/>
   - Downloaded genome data from <ftp://ftp.ncbi.nlm.nih.gov/genomes/all/>
 
-```
-mkdir -p ./{data/$(date +%F),analysis/$(date +%F)}
-mkdir -p ./{data/2018-10-28,analysis/2018-10-28}
-mkdir -p ./{data/2018-12-22,analysis/2018-12-22}
-```
-
 ## project directories
 
     assembly_reports/
@@ -34,9 +30,18 @@ mkdir -p ./{data/2018-12-22,analysis/2018-12-22}
      data/: contains metadata and genome data
      analysis/: contains results of data analyses
 
+## scripts
+
+The shell script `scripts/run.sh` automatically carries out the entire steps: creating directories (`data/` and `analysis/`), 
+running the shell script for downloading data `scripts/run_get_assembly_summary.sh`, and for inspecting data `scripts/run_inspecting_assembly_summary.sh` (generating the output files `analysis/output_*.txt`).
+
+Let's run the driver script in the project's main directory `assembly_reports/` with:
+
+    bash scripts/run.sh > log.$(date +%F).txt 2>&1 &
+
 ## data
 
-Data downloaded on 2018-10-28, 2018-12-22 from <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/> into `data/`:
+Data downloaded on 2018-10-28, 2018-12-22, and 2019-01-08 from <ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/> into `data/`:
 
 ```
 ANI_report_bacteria.txt
@@ -58,44 +63,8 @@ MD5 (GCF_000005845.2_ASM584v2_genomic.gff.gz) = 83b7ffb7880b432ca0ef8f591e4d0a3f
 MD5 (GCF_000008865.2_ASM886v2_genomic.gff.gz) = 75d2b78bb53ed8c8bd33978bb5c0e640
 ```
 
-## scripts
-
-The shell script `scripts/run.sh` automatically carries out the entire steps: creating directories (`data/` and `analysis/`), downloading data files, 
-running the shell script for downloading data `scripts/run_get_assembly_summary.sh`, and for inspecting data `scripts/run_inspecting_assembly_summary.sh` (generating the output files `analysis/output.txt`).
-
-Let's run the driver script in the project's main directory `assembly_reports/` with:
-
-    bash scripts/run.sh > log.$(date +%F).txt 2>&1 &
-
-inspecting metadata `assembly_summary_{genbank,refseq}.txt` with:
-```
-assembly_summary="assembly_summary_genbank.txt"
-assembly_summary="assembly_summary_refseq.txt"
-YYYYMMDD="2018-12-22"
-#YYYYMMDD="2018-10-28"
-YYYYMMDD=""
-metadata="$PWD/data/${YYYYMMDD}/${assembly_summary}"; output="$PWD/analysis/${YYYYMMDD}/output_${assembly_summary}"
-bash scripts/run_inspecting_assembly_summary.sh "$metadata" 2> stderr.txt > "$output"
-```
-
-downloading genome data (GFF files)
-```
-organism_name="Escherichia coli"
-organism_name="Escherichia coli|Borreliella burgdorferi|Sinorhizobium meliloti"
-organism_name="Escherichia coli str. K-12 substr. MG1655|Escherichia coli O157:H7 str. Sakai"
-bash scripts/run_get_gff.sh "$metadata" "$organism_name" 2> stderr.txt > log.get_gff.txt
-```
-
-inspecting genome data (GFF file) with:
-```
-GFF="data/GCF_000008865.2_ASM886v2_genomic.gff" # Escherichia coli O157:H7 str. Sakai
-bash scripts/run_inspecting_gff.sh "$GFF" 2> stderr.txt > analysis/output_gff.txt
-```
-
-bash scripts/run_inspecting_gff_all.sh "$GFF" > "analysis/output_gff_all.txt"
-
-
 ## analysis
+解析結果
 
 ### assembly_summary_refseq.txt
 
@@ -126,19 +95,14 @@ bash scripts/run_inspecting_gff_all.sh "$GFF" > "analysis/output_gff_all.txt"
 
 ### gff
 
+- Genome size of "Escherichia coli O157:H7 str. Sakai" (5498578 bp) was larger than that of "Escherichia coli str. K-12 substr. MG1655" (4641652 bp).
+- The number of proteins with unknown function (i.e. "hypothetical protein") was larger in "str. Sakai" (784) than in "str. K-12" (5).
+
 ```
 # assembly_accession organism_name
 GCF_000005845.2 Escherichia coli str. K-12 substr. MG1655
-GCF_000006965.1 Sinorhizobium meliloti 1021
-GCF_000008685.2 Borreliella burgdorferi B31
 GCF_000008865.2 Escherichia coli O157:H7 str. Sakai
-GCF_000026345.1 Escherichia coli IAI39
-GCF_000183345.1 Escherichia coli O83:H1 str. NRG 857C
-GCF_000299455.1 Escherichia coli O104:H4 str. 2011C-3493
 ```
-
-- Genome size of "Escherichia coli O157:H7 str. Sakai" (5498578 bp) was larger than that of "Escherichia coli str. K-12 substr. MG1655" (4641652 bp).
-- The number of proteins with unknown function (i.e. "hypothetical protein") was larger in "str. Sakai" (784) than in "str. K-12" (5).
 
 #### GCF_000008865.2_ASM886v2_genomic.gff
 GCF_000008865.2 Escherichia coli O157:H7 str. Sakai
@@ -182,7 +146,7 @@ NC_000913.3	4641652
    4 IS3 element protein InsF
 ```
 
-## Reproducibility test
+## reproducibility test
 再現性テスト
 
 ```
@@ -191,7 +155,7 @@ diff analysis/2018-10-28/output_assembly_summary_refseq.txt analysis/2018-12-22/
 
 The results were reproduced by other researchers, including my classmate, advisor, collaborator, and colleague.
 
-### Run environment
+### run environment
 実行環境
 
 #### hdmac00 - λ18
@@ -200,26 +164,21 @@ The results were reproduced by other researchers, including my classmate, adviso
 	$ uname -a
 	Darwin hdmac00.sfc.keio.ac.jp 15.6.0 Darwin Kernel Version 15.6.0: Mon Aug 29 20:21:34 PDT 2016; root:xnu-3248.60.11~1/RELEASE_X86_64 x86_64
 
-	> sessionInfo()
-	R version 3.3.1 (2016-06-21)
-	Platform: x86_64-apple-darwin13.4.0 (64-bit)
-	Running under: OS X 10.11.6 (El Capitan)
-
 #### Haruo Suzuki's Mac OS X 10.9.5
 
 	$uname -a
 	Darwin localhost 13.4.0 Darwin Kernel Version 13.4.0: Mon Jan 11 18:17:34 PST 2016; root:xnu-2422.115.15~1/RELEASE_X86_64 x86_64
 
-	> sessionInfo()
-	R version 3.3.0 (2016-05-03)
-	Platform: x86_64-apple-darwin13.4.0 (64-bit)
-	Running under: OS X 10.9.5 (Mavericks)
-
-## run environment
+#### Haruo Suzuki's Mac OS X 10.13.6
 
 ```
 $uname -a
-Darwin net74-dhcp153.sfc.keio.ac.jp 17.7.0 Darwin Kernel Version 17.7.0: Fri Nov  2 20:43:16 PDT 2018; root:xnu-4570.71.17~1/RELEASE_X86_64 x86_64
+Darwin net74-dhcp228.sfc.keio.ac.jp 17.7.0 Darwin Kernel Version 17.7.0: Fri Nov  2 20:43:16 PDT 2018; root:xnu-4570.71.17~1/RELEASE_X86_64 x86_64
+
+$sw_vers
+ProductName:	Mac OS X
+ProductVersion:	10.13.6
+BuildVersion:	17G4015
 ```
 
 ## references
